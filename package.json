@@ -1,0 +1,14 @@
+{
+  "name": "calcMU",
+  "version": "1.0.0",
+  "description": "calc MUs(ingress Score) of polygon. Japan local only",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "KamataRyo",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt": "^0.4.5"
+  }
+}
