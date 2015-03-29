@@ -301,7 +301,7 @@ return result_yy;
 }
 
 function getPopulation(code){
-	var json = require('./jsons/population.json');
+	var json = require('../jsons/population.json');
 	var result = json[code];
 	if (result) {
 		return result;

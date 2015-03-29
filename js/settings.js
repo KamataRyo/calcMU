@@ -1,2 +1,2 @@
 exports.port = 1337;
-exports.host = '10.0.2.15';
+exports.host = '127.0.0.1';

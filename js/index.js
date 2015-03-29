@@ -15,7 +15,6 @@ function analyzeURL(req , res){
 		//アプリケーション名前で処理を判別
 		appName = urlInfo.pathname.split("/")[1];
 		switch(appName){
-			//リフレクション？
 			case 'calcMU' :
 				app.resourceExists = true;
 				app.act = calcMU;
@@ -42,8 +41,6 @@ function analyzeURL(req , res){
   		return true;
   	};
 
-
-  	res.writeHead(200, {'Content-Type' : 'text/plain'});
   	app.act(app.query,res);
   	return true;
 }
@@ -52,17 +49,34 @@ function analyzeURL(req , res){
 calcMU = function(q,res){
 	//クエリ分解
 	var polygon = [];
-	var p1 = {"lat" : parseFloat(q.ll1.split(',')[0]), "lon" : parseFloat(q.ll1.split(',')[1])};
-	var p2 = {"lat" : parseFloat(q.ll2.split(',')[0]), "lon" : parseFloat(q.ll2.split(',')[1])};
-	var p3 = {"lat" : parseFloat(q.ll3.split(',')[0]), "lon" : parseFloat(q.ll3.split(',')[1])};
+	var p1 = {};
+	var p2 = {};
+	var p3 = {};
 
+
+	try{		
+		console.log(q.ll1);
+		p1 = {"lat" : parseFloat(q.ll1.split(',')[0]), "lon" : parseFloat(q.ll1.split(',')[1])};
+		p2 = {"lat" : parseFloat(q.ll2.split(',')[0]), "lon" : parseFloat(q.ll2.split(',')[1])};
+		p3 = {"lat" : parseFloat(q.ll3.split(',')[0]), "lon" : parseFloat(q.ll3.split(',')[1])};
+	}catch(e){
+		res.writeHead(400, {'Content-Type' : 'text/plain'});
+  		res.write('400 Bad Request. unknown queries');
+  		return true;
+	}
+	
 	polygon.push(p1);
 	polygon.push(p2);
 	polygon.push(p3);
 
-	var mods = require('./MUcalc.js');
-	console.log(polygon);
-	res.write(mods.calcMU(polygon) + 'MUs');
+	var mods = require('./polygon.js');
+	var result = {};
+	result.polygonGPS = [p1,p2,p3];
+	result.value = mods.calcMU(polygon);
+	result.unit = 'MU(s)';
+	console.log(result);
+	res.writeHead(200, {'Content-Type' : 'text/plain'});
+	res.write(result.value + result.unit);
 };
 
 
