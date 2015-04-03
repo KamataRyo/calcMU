@@ -1,8 +1,19 @@
+
+
+
+
+
+
 var URLs1 = [];//2,199 MU
 var URLs2 = [];//2,249 MU
 var URLs3 = [];
 //Kumanogawa River Stone Monument
-var p1 = "https://www.ingress.com/intel?ll=33.814384,135.857839&z=21&pll=33.814377,135.857808";
+var p1 = {};
+p1.string = "https://www.ingress.com/intel?ll=33.814384,135.857839&z=21&pll=33.814377,135.857808";
+p1.ll = "33.814384,135.857839";
+exports.p1 = p1;
+
+
 //JR周参見駅
 var p2 = "https://www.ingress.com/intel?ll=33.548038,135.500164&z=16&pll=33.54685,135.495491";
 //周参見 イノブータン大王

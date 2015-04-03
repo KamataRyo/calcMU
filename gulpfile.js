@@ -3,22 +3,17 @@
 
 
 var gulp = require("gulp");
+var mocha = require("gulp-mocha");
 
-
-gulp.task('hello',['imgcp'], function(){
-	console.log('hello gulp');
+gulp.task('mocha', function(){
+	return gulp.src(['test/geoAnalysis.test.js'],{read : false})
+	.pipe(mocha({reporter : 'nyan'}))
 });
 
 
-gulp.task('imgcp', function(){
-	return gulp.src('./workingFiles/intersecting.png')
-		.pipe(gulp.dest('./gulptetstfolder'));
-});
-
-gulp.task('', function(){
-	return gulp.src('./workingFiles/intersecting.png')
-		.pipe(gulp.dest('./gulptetstfolder'));
+gulp.task('watch',function(){
+	gulp.watch(['./js/*.js','./test/*.test.js'],['default']);
 });
 
 
-gulp.task('default',['hello','imgcp']);
+gulp.task('default', ['mocha']);
