@@ -69,7 +69,7 @@ calcMU = function(q,res){
 	polygon.push(p2);
 	polygon.push(p3);
 
-	var mods = require('./polygon.js');
+	var mods = require('./geoAnalysis.js');
 	var result = {};
 	result.polygonGPS = [p1,p2,p3];
 	result.value = mods.calcMU(polygon);

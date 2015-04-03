@@ -27,7 +27,7 @@ URLs2.push(p4);
 URLs2.push(p2);
 
 //URLをparseしてllの値を取得
-function getLocation(url){
+exports.getLocation = function(url){
 	var qs = require('querystring');
 	var hasQuery = url.indexOf('?') != -1;
 	if (hasQuery) {

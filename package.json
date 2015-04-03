@@ -9,6 +9,7 @@
   "author": "KamataRyo",
   "license": "ISC",
   "devDependencies": {
-    "grunt": "^0.4.5"
+    "gulp": "^3.8.11",
+    "gulp-mocha": "^2.0.1"
   }
 }

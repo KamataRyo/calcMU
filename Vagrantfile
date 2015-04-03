@@ -14,8 +14,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "centos64box"
 
   # shellscript provisioning
-  config.vm.provision :shell, :path => "./bootstrap.sh" ,:privileged   => true
-
+  #  config.vm.provision :shell, :path => "./provisioning.sh" ,:privileged   => false
+  
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
