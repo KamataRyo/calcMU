@@ -1,5 +1,5 @@
 //URLをparseしてllの値を取得
-exports.getLocation = function(url){
+var getLocation = function(url){
 	var qs = require('querystring');
 	var hasQuery = url.indexOf('?') != -1;
 	if (hasQuery) {
@@ -15,16 +15,21 @@ exports.getLocation = function(url){
 		return result;
 	};
 	return result;
-}
+};
+//外部にも提供
+//おそらく、あまりよい解決方法ではない。
+exports.getLocation = getLocation;
+
 
 //複数のURLをparseしてllの値を取得
 exports.getLocations = function (urls){
-	result = [];
-	for (var i = urls.length - 1; i >= 0; i--) {
+	var result = [];
+	for (var i = 0 ; i < urls.length ; i++) {
 			result.push(getLocation(urls[i]));
 		};
 	return result;
-}
+};
+
 
 //緯度経度を処理してメッシュオブジェクトを生成
 exports.getMesh = function(point){
@@ -87,10 +92,13 @@ exports.getMesh = function(point){
 	result.polygon = [p1, p2, p3, p4];
 
 	return result;
-}
+};
+
+
+
 
 //矩形複数の点から、すべての点を包含する長方形（キャンバスと呼ぶ）を作成。
-function createCanvas(points){
+exports.createCanvas = function(points){
 	var p;
 	var max = {}, min = {};
 	max.lat = points[0].lat;
@@ -121,10 +129,13 @@ function createCanvas(points){
 			  "lon" : max.lon};
 	result.polygon = [p1, p2, p3, p4];
 	return result;
-}
+};
+
+
+
 
 //キャンバスを満たす、1/2メッシュオブェクト行列を作成
-function createMeshCodeMatrixFromCanvas(canvas){
+exports.createMeshCodeMatrixFromCanvas = function(canvas){
 	var result_x = [];
 	var result_y = [];
 	var p;
@@ -138,27 +149,34 @@ function createMeshCodeMatrixFromCanvas(canvas){
 		result_x = [];
 	};
 	return result_y;
-}
+};
+
+
 
 //p1, p2からなる線分が、経度軸との間で挟む符号付面積を求める
-function calcShadowArea(p1, p2){
+var calcShadowArea = function(p1, p2){
 	var result = (p2.lat + p1.lat) * (p2.lon - p1.lon) / 2;
 	return result;
-}
+};
+//外部にも提供
+exports.calcShadowArea = calcShadowArea;
+
+
+
 
 //ポリゴンにおけるすべての線分の、符号付面積の総和。ポリゴンの面積に相当。
-function calcArea(points){
+exports.calcArea = function(points){
 	var result = 0;
 	for (var i = 0; i <= points.length - 2; i++) {
 		result += calcShadowArea(points[i], points[i + 1]);
 	};
 	result += calcShadowArea(points[i], points[0]);
 	return result;
-}
+};
 
 //連立方程式を解く
 //matrix =[[a,b,-s],[c,d,-t]]
-function solveMatrix(matrix){
+var solveMatrix = function(matrix){
 	var a = matrix[0][0];
 	var b = matrix[0][1];
 	var s = matrix[0][2] * -1 ;
@@ -171,10 +189,12 @@ function solveMatrix(matrix){
 	var y = (1 / det) * (-1 * s * c + a * t);
 	var result = {"lat" : y, "lon" : x};
 	return result;
-}
+};
+exports.solveMatrix = solveMatrix;
+
 
 //2点から直線の方程式の行列[a,b,-s]を作成
-function createFunctionMatrixFromASegment(seg){
+var createFunctionMatrixFromASegment = function(seg){
 	var p1 = seg[0];
 	var p2 = seg[1];
 	var x1 = p1.lon;
@@ -186,7 +206,8 @@ function createFunctionMatrixFromASegment(seg){
 	var s = x2 * y1 - x1 * y2;//定数項
 	var result = [a, b, -1 * s];
 	return result;
-}
+};
+exports.createFunctionMatrixFromASegment = createFunctionMatrixFromASegment;
 
 
 //2線分の交点の有無を判定
