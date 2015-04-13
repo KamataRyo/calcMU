@@ -3,7 +3,7 @@ var geoA = require('../js/geoAnalysis.js');
 var q = "";
 
 
-describe('geoAnalysis',function(){
+describe('geoAnalysisのテスト',function(){
 
 	q = 'wheather single url with a "ll" query can be parsed.';
 	it(q,function(){

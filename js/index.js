@@ -8,6 +8,7 @@ function analyzeURL(req , res){
 	app.method = req.method;
 	//アプリケーションの名前を取得
 	var nestedAppName = urlInfo.pathname.split("/");
+
 	if (nestedAppName.length < 2) {
 		//appName以降に/があるとき(appName/child/child/...)=ネスとした名前での要求は受け付けない
 		app.resourceExists = false;
@@ -31,7 +32,7 @@ function analyzeURL(req , res){
 	if (app.method !== 'GET') {
 		//get以外でアクセスするリソースは、いまのところない
 		res.writeHead(405, {'Content-Type' : 'text/plain'});
-		res.write('405 Method Not Allowed. Please GET your resource.');
+		res.write('405 Method Not Allowed. No resource not to get.');
 		return true;
 	};
 
@@ -45,7 +46,7 @@ function analyzeURL(req , res){
   	return true;
 }
 
-
+//appの内部の定義
 calcMU = function(q,res){
 	//クエリ分解
 	var polygon = [];
@@ -80,7 +81,7 @@ calcMU = function(q,res){
 };
 
 
-//サーバ
+//サーバ部分
 var http = require('http');
 var settings = require('./settings.js');
 var server = http.createServer();
