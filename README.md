@@ -1,10 +1,10 @@
 # calcMU
 ## description
-This is node server of a WebAPI which calculate population in a polygon, in other sense "MUs" value of Ingress.
+This is node server of a WebAPI which can calculate population in a given polygon with 3 angles, in other sense "MUs" score in Ingress.
 Values are reliable in Japan only.
 
-## Data
-data come from e-stat, Japanese Govemnment.
+## data
+Population data comes from e-stat, Japanese Govemnment.
 
-## dependancy
-Vagrantfile depends on my environment, not general.
+## dependency
+'Vagrantfile' depends on my environment, not general.
