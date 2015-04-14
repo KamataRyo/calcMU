@@ -16,13 +16,10 @@ var getLocation = function(url){
 	};
 	return result;
 };
-//外部にも提供
-//おそらく、あまりよい解決方法ではない。
-exports.getLocation = getLocation;
 
 
 //複数のURLをparseしてllの値を取得
-exports.getLocations = function (urls){
+var getLocations = function (urls){
 	var result = [];
 	for (var i = 0 ; i < urls.length ; i++) {
 			result.push(getLocation(urls[i]));
@@ -32,7 +29,7 @@ exports.getLocations = function (urls){
 
 
 //緯度経度を処理してメッシュオブジェクトを生成
-exports.getMesh = function(point){
+var getMesh = function(point){
 	var lat0 = point.lat;
 	var lon0 = point.lon;
 	//1次メッシュ。
@@ -98,7 +95,7 @@ exports.getMesh = function(point){
 
 
 //矩形複数の点から、すべての点を包含する長方形（キャンバスと呼ぶ）を作成。
-exports.createCanvas = function(points){
+var createCanvas = function(points){
 	var p;
 	var max = {}, min = {};
 	max.lat = points[0].lat;
@@ -135,7 +132,7 @@ exports.createCanvas = function(points){
 
 
 //キャンバスを満たす、1/2メッシュオブェクト行列を作成
-exports.createMeshCodeMatrixFromCanvas = function(canvas){
+var createMeshCodeMatrixFromCanvas = function(canvas){
 	var result_x = [];
 	var result_y = [];
 	var p;
@@ -158,14 +155,11 @@ var calcShadowArea = function(p1, p2){
 	var result = (p2.lat + p1.lat) * (p2.lon - p1.lon) / 2;
 	return result;
 };
-//外部にも提供
-exports.calcShadowArea = calcShadowArea;
-
 
 
 
 //ポリゴンにおけるすべての線分の、符号付面積の総和。ポリゴンの面積に相当。
-exports.calcArea = function(points){
+var calcArea = function(points){
 	var result = 0;
 	for (var i = 0; i <= points.length - 2; i++) {
 		result += calcShadowArea(points[i], points[i + 1]);
@@ -190,8 +184,6 @@ var solveMatrix = function(matrix){
 	var result = {"lat" : y, "lon" : x};
 	return result;
 };
-exports.solveMatrix = solveMatrix;
-
 
 //2点から直線の方程式の行列[a,b,-s]を作成
 var createFunctionMatrixFromASegment = function(seg){
@@ -207,11 +199,9 @@ var createFunctionMatrixFromASegment = function(seg){
 	var result = [a, b, -1 * s];
 	return result;
 };
-exports.createFunctionMatrixFromASegment = createFunctionMatrixFromASegment;
-
 
 //2線分の交点の有無を判定
-function segmentsCross(seg1, seg2){
+var segmentsCross = function (seg1, seg2){
 	//1x3行列の積を求める
 	var mmult = function (m1,x,y){
 		return m1[0] * x + m1[1] * y + m1[2];
@@ -224,10 +214,11 @@ function segmentsCross(seg1, seg2){
 	var result4 = mmult(matrix2,seg1[1].lon,seg1[1].lat);
 	var result = (result1 * result2 < 0) && (result3 * result4 < 0);
 	return result;
-}
+};
+
 
 //ポリゴンの線分をイテレート
-function iteratePolygonSegments(poly){
+var iteratePolygonSegments = function(poly){
 	var result = [];
 	for (var i = 0; i <= poly.length -2 ; i++) {
 		result.push([poly[i],poly[i + 1]]);
@@ -235,10 +226,11 @@ function iteratePolygonSegments(poly){
 	result.push([poly[i],poly[0]]);
 
 	return result;
-}
+};
+
 
 //ポリゴン（=ポイントの配列）の中に、あるポイントが含まれるかどうかを判定する
-function pointInPolygon(point,polygon){
+var pointInPolygon = function(point,polygon){
 	var result = 0;
 	var buf = false;
 
@@ -252,10 +244,12 @@ function pointInPolygon(point,polygon){
 		if (buf) {result++;};
 	};
 	return (result % 2 === 1);
-}
+};
+
+
 
 //ポリゴンの重複判定
-function polygonsIntersect(poly1, poly2){
+var polygonsIntersect = function(poly1, poly2){
 	var crossed = false;
 	var segs1 = iteratePolygonSegments(poly1);
 	var segs2 = iteratePolygonSegments(poly2);
@@ -266,11 +260,19 @@ function polygonsIntersect(poly1, poly2){
 		};
 	};
 	return false;
-}
+};
+
+
+var getIntersect = function(){};
+
+
+
+
+
 
 //あるメッシュにおけるポリゴンの面積重複率を求める
-function ovarwrapRate(mesh, poly){
-	var point = {"lat" : (mesh.bottom + mesh.top)/2, "lon" : (mesh.left +mesh.right)/2};
+var ovarwrapRate = function(mesh, poly){
+	var point = {"lat" : (mesh.bottom + mesh.top)/2, "lon" : (mesh.left + mesh.right)/2};
 	var intersect = polygonsIntersect(poly,mesh.polygon);
 	var inside = pointInPolygon(point,poly);
 	if (intersect) {return 0.5;};
@@ -278,7 +280,10 @@ function ovarwrapRate(mesh, poly){
 	if (!intersect &&  inside)  {return 1;};
 };
 
-function getOverwrapRateMatrix(matrix,poly){
+
+
+
+var getOverwrapRateMatrix = function(matrix,poly){
 	var result_xx=[];
 	var result_yy=[];
 	var buf;
@@ -291,9 +296,11 @@ function getOverwrapRateMatrix(matrix,poly){
 		result_xx = [];
 	};
 return result_yy;
-}
+};
 
-function getPopulation(code){
+
+
+var getPopulation = function(code){
 	var json = require('../jsons/population.json');
 	var result = json[code];
 	if (result) {
@@ -301,9 +308,9 @@ function getPopulation(code){
 	}else{
 		return 0;
 	};
-}
+};
 
-function calcPopulation(meshMatrix,rateMatrix){
+var calcPopulation = function(meshMatrix,rateMatrix){
 	var result = 0;
 	var code = "";
 	var rate;
@@ -315,15 +322,37 @@ function calcPopulation(meshMatrix,rateMatrix){
 		};
 	};
 	return result;
-}
+};
 
-exports.calcMU = function(locations){
+var calcMU = function(locations){
 	//var locations     = getLocations(urls);
 	var canvas        = createCanvas(locations);
 	var meshMatrix    = createMeshCodeMatrixFromCanvas(canvas);
 	var overRapMatrix = getOverwrapRateMatrix(meshMatrix,locations);
 
 	return calcPopulation(meshMatrix,overRapMatrix);
-}
+};
 
-//console.log(calcMU(URLs0));
+
+
+
+exports.getLocation = getLocation;
+exports.getLocations = getLocations;
+exports.getMesh = getMesh;
+exports.createCanvas = createCanvas;
+exports.createMeshCodeMatrixFromCanvas = createMeshCodeMatrixFromCanvas;
+exports.calcShadowArea = calcShadowArea;
+exports.calcArea = calcArea;
+exports.solveMatrix = solveMatrix;
+exports.createFunctionMatrixFromASegment = createFunctionMatrixFromASegment;
+exports.segmentsCross = segmentsCross;
+exports.iteratePolygonSegments = iteratePolygonSegments;
+exports.pointInPolygon = pointInPolygon;
+exports.polygonsIntersect = polygonsIntersect;
+exoorts.getIntersect = getIntersect;
+exports.ovarwrapRate = ovarwrapRate;
+exports.getOverwrapRateMatrix = getOverwrapRateMatrix;
+exports.getPopulation = getPopulation;
+exports.calcPopulation = calcPopulation;
+exports.calcMU = calcMU;
+

@@ -117,10 +117,55 @@ describe('geoAnalysisのテスト',function(){
 			{"lat" : 2, "lon" : 4}
 		];//segment
 		var ans = [2,3,4];//functionMatrix
-		//geoA.createFunctionMatrixFromASegment(arg).should.equal(ans);
-		[1,1,1].should.deepEqual([1,1,1]);
+		geoA.createFunctionMatrixFromASegment(arg).should.equal(ans);
+		//[1,1,1].should.deepEqual([1,1,1]);
 	});
 
+
+
+	q="test of 'segmentsCross'";
+	it(q, function(){});
+
+
+
+	q = "test of 'iteratePolygonSegments'";
+	it(q, function(){});
+
+
+	q = "test of 'pointInPolygon'";
+	it(q, function(){});
+
+
+	q = "test of 'polygonsIntersect'";
+	it(q, function(){});
+
+
+	q = "test of 'getIntersect'";
+	it(q, function(){});
+
+	q = "test of 'ovarwrapRate'";
+	it(q, function(){});	
+
+
+	q = "test of 'getOverwrapRateMatrix'";
+	it(q, function(){});	
+
+
+	q = "test of 'getPopulation'";
+	it(q, function(){});
+
+
+
+	q = "test of 'calcPopulation'";
+	it(q, function(){});	
+
+
+	q = "test of 'calcMU'";
+	it(q, function(){});	
+
+
+
+	
 });
 
 

@@ -7,7 +7,7 @@ var mocha = require("gulp-mocha");
 
 gulp.task('mocha', function(){
 	return gulp.src(['test/geoAnalysis.test.js'],{read : false})
-	.pipe(mocha({reporter : 'dot'}))
+	.pipe(mocha({reporter : 'nyan'}))
 });
 
 

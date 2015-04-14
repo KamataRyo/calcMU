@@ -91,9 +91,6 @@ server.on('request', function(req, res){
 	analyzeURL(req,res);
 	res.end();
 
-  	// //最後までたどり着けてしまったら、処理がおかしい。
-  	// res.writeHead(500,{'Content-Type' : 'text/plain'});
-  	// res.write('500 Internal Server Error. I cannot understand your request.');
 });
 
 server.listen(settings.port, settings.host);
