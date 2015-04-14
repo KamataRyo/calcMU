@@ -8,3 +8,4 @@ Population data comes from e-stat, Japanese Govemnment.
 
 ## dependency
 'Vagrantfile' depends on my environment, not general.
+'provisioning.sh' is on working, not effective.
