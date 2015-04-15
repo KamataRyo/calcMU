@@ -86,7 +86,7 @@ var getMesh = function(point){
 	var p2 = {"lat" : result.top,    "lon" : result.left};
 	var p3 = {"lat" : result.top,    "lon" : result.right};
 	var p4 = {"lat" : result.bottom, "lon" : result.right};
-	result.polygon = [p1, p2, p3, p4];
+	result.polygon = [p1, p2, p3, p4];//左下から時計回り
 
 	return result;
 };
@@ -168,9 +168,27 @@ var calcArea = function(points){
 	return result;
 };
 
+
+
+
+//線分から直線の方程式(ax + by - s = 0)の行列[a,b,-s]を作成
+var createFunctionMatrixFromASegment = function(seg){
+	var p1 = seg[0];
+	var p2 = seg[1];
+	var x1 = p1.lon;
+	var y1 = p1.lat;
+	var x2 = p2.lon;
+	var y2 = p2.lat;
+	var a = y1 - y2;//xの係数
+	var b = x2 - x1;//yの係数
+	var s = x2 * y1 - x1 * y2;//定数項
+	var result = [a, b, -1 * s];
+	return result;
+};
+
 //連立方程式を解く
 //matrix =[[a,b,-s],[c,d,-t]]
-var solveMatrix = function(matrix){
+var solveMatrices = function(matrix){
 	var a = matrix[0][0];
 	var b = matrix[0][1];
 	var s = matrix[0][2] * -1 ;
@@ -185,20 +203,7 @@ var solveMatrix = function(matrix){
 	return result;
 };
 
-//2点から直線の方程式の行列[a,b,-s]を作成
-var createFunctionMatrixFromASegment = function(seg){
-	var p1 = seg[0];
-	var p2 = seg[1];
-	var x1 = p1.lon;
-	var y1 = p1.lat;
-	var x2 = p2.lon;
-	var y2 = p2.lat;
-	var a = y1 - y2;//xの係数
-	var b = x2 - x1;//yの係数
-	var s = x2 * y1 - x1 * y2;//定数項
-	var result = [a, b, -1 * s];
-	return result;
-};
+
 
 //2線分の交点の有無を判定
 var segmentsCross = function (seg1, seg2){
@@ -217,6 +222,16 @@ var segmentsCross = function (seg1, seg2){
 };
 
 
+//2線分の交点を求める
+var getCrossPoint = function(seg1,seg2){
+	var m1 = createFunctionMatrixFromASegment(seg1);
+	var m2 = createFunctionMatrixFromASegment(seg2);
+	var crossed = segmentsCross(seg1,seg2);
+	if (crossed) {return solveMatrices([m1,m2]);}
+	else{return false};
+};
+
+
 //ポリゴンの線分をイテレート
 var iteratePolygonSegments = function(poly){
 	var result = [];
@@ -225,6 +240,16 @@ var iteratePolygonSegments = function(poly){
 	};
 	result.push([poly[i],poly[0]]);
 
+	return result;
+};
+
+//線分イテレートからポリゴンを作成
+var joinSegmentsToPolygon = function(segs){
+	var result = [];
+	for (var i = 0; i <= poly.length -1; i++) {
+		result.push(segs[i][0]);
+	};
+	result.push[i][1];
 	return result;
 };
 
@@ -246,7 +271,15 @@ var pointInPolygon = function(point,polygon){
 	return (result % 2 === 1);
 };
 
-
+var segmentCrossPolygon = function(seg, poly){
+	var segs = iteratePolygonSegments(poly);
+	var result = false;
+	for (var i = segs.length - 1; i >= 0; i--) {
+		result = segmentsCross(segs[i],seg);
+		if (result) {break};
+	};
+	return result;
+};
 
 //ポリゴンの重複判定
 var polygonsIntersect = function(poly1, poly2){
@@ -262,8 +295,55 @@ var polygonsIntersect = function(poly1, poly2){
 	return false;
 };
 
+//三角形の向きを判定する
+var getTriangleDirection = function(triangle){
+	var segs = iteratePolygonSegments(triangle);
+	var x1 = segs[1].lon - segs[0].lon;
+	var x2 = segs[2].lon - segs[1].lon;
+	var y1 = segs[1].lat - segs[0].lat;
+	var y2 = segs[2].lat - segs[1].lat;
+	//外積
+	var result = x1 * y2 - x2 * y1;
+	return result;
+};
 
-var getIntersect = function(){};
+
+
+//Intersectの特殊実装(三角形x四角形（メッシュ）のケース)
+var getIntersect = function(triangle, mesh){
+	var segs1 = iteratePolygonSegments(triangle);
+	var segs2 = iteratePolygonSegments(mesh.polygon);
+	var crosspoints = [];//key = 交点オブジェクト、
+	var buf;
+	//すべての交点を求める
+	for (var i = segs1.length - 1; i >= 0; i--) {
+		for (var j = segs2.length - 1; j >= 0; j--) {
+			buf = getCrossPoint(segs1[i],segs2[j]);
+			if(buf){
+				crosspoints.push({
+					"angle" : Math.atan2(buf.lat, buf.lon),
+					"point" : buf
+				});
+			};
+		};	
+	};
+
+	//angleでソート
+	crosspoints.sort(function(a, b){
+      var x = a.angle;
+      var y = b.angle;
+      if (x > y) return 1;
+      if (x < y) return -1;
+      return 0;
+    });
+
+	//再度polygon構造体に変換
+	var result = [];
+	for (var i = crosspoints.length - 1; i >= 0; i--) {
+		result.push(crosspoints[i].point);
+	};
+	return result;
+};
 
 
 
@@ -275,7 +355,11 @@ var ovarwrapRate = function(mesh, poly){
 	var point = {"lat" : (mesh.bottom + mesh.top)/2, "lon" : (mesh.left + mesh.right)/2};
 	var intersect = polygonsIntersect(poly,mesh.polygon);
 	var inside = pointInPolygon(point,poly);
-	if (intersect) {return 0.5;};
+	if (intersect) {
+		var meshArea = (mesh.right - mesh.left) * (mesh.top - mesh.bottom);
+		var intersectionArea = calcArea(getIntersect(poly, mesh));
+		return Math.abs(intersectionArea / meshArea);
+	};
 	if (!intersect && !inside)  {return 0;};
 	if (!intersect &&  inside)  {return 1;};
 };
@@ -343,16 +427,19 @@ exports.createCanvas = createCanvas;
 exports.createMeshCodeMatrixFromCanvas = createMeshCodeMatrixFromCanvas;
 exports.calcShadowArea = calcShadowArea;
 exports.calcArea = calcArea;
-exports.solveMatrix = solveMatrix;
+exports.solveMatrices = solveMatrices;
 exports.createFunctionMatrixFromASegment = createFunctionMatrixFromASegment;
 exports.segmentsCross = segmentsCross;
+exports.getCrossPoint = getCrossPoint;
 exports.iteratePolygonSegments = iteratePolygonSegments;
 exports.pointInPolygon = pointInPolygon;
 exports.polygonsIntersect = polygonsIntersect;
-exoorts.getIntersect = getIntersect;
+exports.getIntersect = getIntersect;
 exports.ovarwrapRate = ovarwrapRate;
 exports.getOverwrapRateMatrix = getOverwrapRateMatrix;
 exports.getPopulation = getPopulation;
 exports.calcPopulation = calcPopulation;
 exports.calcMU = calcMU;
+exports.getTriangleDirection = getTriangleDirection;
+
 

@@ -128,6 +128,11 @@ describe('geoAnalysisのテスト',function(){
 
 
 
+	q="test of 'getCrossPoint'";
+	it(q, function(){});
+
+
+
 	q = "test of 'iteratePolygonSegments'";
 	it(q, function(){});
 
@@ -165,7 +170,17 @@ describe('geoAnalysisのテスト',function(){
 
 
 
-	
+	q="triangle Direction test";
+	it(q,function(){
+		var arg = [
+			{"lat" : 0, "lon" :0},
+			{"lat" : 1, "lon" :0},
+			{"lat" : 1, "lon" :1}
+		];
+		(geoA.getTriangleDirection(arg) === 0).should.be.true;
+		console.log(geoA.getTriangleDirection(arg));
+	});
+
 });
 
 
