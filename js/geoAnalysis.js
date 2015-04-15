@@ -358,7 +358,9 @@ var ovarwrapRate = function(mesh, poly){
 	if (intersect) {
 		var meshArea = (mesh.right - mesh.left) * (mesh.top - mesh.bottom);
 		var intersectionArea = calcArea(getIntersect(poly, mesh));
-		return Math.abs(intersectionArea / meshArea);
+		var rate = Math.abs(intersectionArea / meshArea);
+		console.log(intersectionArea,"/",meshArea);
+		return rate;
 	};
 	if (!intersect && !inside)  {return 0;};
 	if (!intersect &&  inside)  {return 1;};
@@ -395,7 +397,7 @@ var getPopulation = function(code){
 };
 
 var calcPopulation = function(meshMatrix,rateMatrix){
-	var result = 0;
+	var result = 0.0;
 	var code = "";
 	var rate;
 	for (var y = 0; y <= meshMatrix.length - 1; y++) {
@@ -409,11 +411,9 @@ var calcPopulation = function(meshMatrix,rateMatrix){
 };
 
 var calcMU = function(locations){
-	//var locations     = getLocations(urls);
 	var canvas        = createCanvas(locations);
 	var meshMatrix    = createMeshCodeMatrixFromCanvas(canvas);
 	var overRapMatrix = getOverwrapRateMatrix(meshMatrix,locations);
-
 	return calcPopulation(meshMatrix,overRapMatrix);
 };
 
