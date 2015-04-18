@@ -48,6 +48,22 @@ function analyzeURL(req , res){
 
 //appの内部の定義
 calcMU = function(q,res){
+	//lat,lonの値チェック
+	var checkPointRange = function(point){
+		var end = require('../jsons/end_of_Japan.json');
+		var endDecimal = {};
+		endDecimal.top = end.top.degree + end.top.minute / 60 + end.top.second / 3600;
+		endDecimal.right = end.right.degree + end.right.minute / 60 + end.right.second / 3600;
+		endDecimal.bottom = end.bottom.degree + end.bottom.minute / 60 + end.bottom.second / 3600;
+		endDecimal.left = end.left.degree + end.left.minute / 60 + end.left.second / 3600;
+		var result;
+		var checkLat;
+		var checkLon;
+		checkLat = (endDecimal.bottom <= point.lat) && (point.lat <= endDecimal.top);
+		checkLon = (endDecimal.left <= point.lon) && (point.lon <= endDecimal.right);
+		result = checkLat && checkLon;
+		return result;
+	};
 	//クエリ分解
 	var polygon = [];
 	var p1 = {};
@@ -70,14 +86,23 @@ calcMU = function(q,res){
 	polygon.push(p2);
 	polygon.push(p3);
 
+	for (var i = polygon.length - 1; i >= 0; i--) {
+		if(!checkPointRange(polygon[i])){
+			res.writeHead(400, {'Content-Type' : 'text/plain'});
+  			res.write('400 Bad Request. Some ll values are too large/small.');
+  			return true;	
+		};
+	};
+
+
 	var mods = require('./geoAnalysis.js');
 	var result = {};
 	result.polygonGPS = [p1,p2,p3];
-	result.value = mods.calcMU(polygon);
+	result.value = Math.round(mods.calcMU(polygon)-0.5);
 	result.unit = 'MU(s)';
-	console.log(result);
 	res.writeHead(200, {'Content-Type' : 'text/plain'});
 	res.write(result.value + result.unit);
+  	return true;
 };
 
 
@@ -87,10 +112,8 @@ var settings = require('./settings.js');
 var server = http.createServer();
 
 server.on('request', function(req, res){
-
 	analyzeURL(req,res);
 	res.end();
-
 });
 
 server.listen(settings.port, settings.host);

@@ -1,0 +1,22 @@
+{
+"right" : {
+	"degree" : 153,
+	"minute" : 59,
+	"second" : 11
+	},
+"left" : {
+	"degree" : 122,
+	"minute" : 56,
+	"second" : 1
+	},
+"bottom" : {
+	"degree" : 20,
+	"minute" : 25,
+	"second" : 31
+	},
+"top" : {
+	"degree" : 45,
+	"minute" : 33,
+	"second" : 26
+	}
+}

@@ -170,16 +170,25 @@ describe('geoAnalysisのテスト',function(){
 
 
 
-	q="triangle Direction test";
+	q="test of 'getIntersect'";
 	it(q,function(){
-		var arg = [
-			{"lat" : 0, "lon" :0},
-			{"lat" : 1, "lon" :0},
-			{"lat" : 1, "lon" :1}
+		var triangle = [
+			{"lat" : 3, "lon" :3},
+			{"lat" : 10, "lon" :3},
+			{"lat" : 3, "lon" :10}
 		];
-		(geoA.getTriangleDirection(arg) === 0).should.be.true;
-		console.log(geoA.getTriangleDirection(arg));
+		var mesh = {};
+		mesh.polygon =[ 
+			{"lat" : 0, "lon" :0},
+			{"lat" : 5, "lon" :0},
+			{"lat" : 5, "lon" :5},
+			{"lat" : 0, "lon" :5}
+		];
+		ans = 4;
+		geoA.getTriangleDirection(triangle, mesh).should.equal(ans);
 	});
+
+
 
 });
 

@@ -313,14 +313,14 @@ var getTriangleDirection = function(triangle){
 var getIntersect = function(triangle, mesh){
 	var segs1 = iteratePolygonSegments(triangle);
 	var segs2 = iteratePolygonSegments(mesh.polygon);
-	var crosspoints = [];//key = 交点オブジェクト、
+	var crosspointsAndInsidePoints = [];//key = 交点及び内部の点オブジェクト、
 	var buf;
 	//すべての交点を求める
 	for (var i = segs1.length - 1; i >= 0; i--) {
 		for (var j = segs2.length - 1; j >= 0; j--) {
 			buf = getCrossPoint(segs1[i],segs2[j]);
 			if(buf){
-				crosspoints.push({
+				crosspointsAndInsidePoints.push({
 					"angle" : Math.atan2(buf.lat, buf.lon),
 					"point" : buf
 				});
@@ -328,8 +328,26 @@ var getIntersect = function(triangle, mesh){
 		};	
 	};
 
+	for (var i = triangle.length - 1; i >= 0; i--) {
+		if (pointInPolygon(triangle[i],mesh.polygon)) {
+			crosspointsAndInsidePoints.push({
+					"angle" : Math.atan2(triangle[i].lat, triangle[i].lon),
+					"point" : triangle[i]
+				});
+		};
+	};
+
+	for (var i = mesh.polygon.length - 1; i >= 0; i--) {
+		if (pointInPolygon(mesh.polygon[i],triangle)) {
+			crosspointsAndInsidePoints.push({
+					"angle" : Math.atan2(mesh.polygon[i].lat, mesh.polygon[i].lon),
+					"point" : mesh.polygon[i]
+				});
+		};
+	};
+
 	//angleでソート
-	crosspoints.sort(function(a, b){
+	crosspointsAndInsidePoints.sort(function(a, b){
       var x = a.angle;
       var y = b.angle;
       if (x > y) return 1;
@@ -339,8 +357,8 @@ var getIntersect = function(triangle, mesh){
 
 	//再度polygon構造体に変換
 	var result = [];
-	for (var i = crosspoints.length - 1; i >= 0; i--) {
-		result.push(crosspoints[i].point);
+	for (var i = crosspointsAndInsidePoints.length - 1; i >= 0; i--) {
+		result.push(crosspointsAndInsidePoints[i].point);
 	};
 	return result;
 };
@@ -359,7 +377,6 @@ var ovarwrapRate = function(mesh, poly){
 		var meshArea = (mesh.right - mesh.left) * (mesh.top - mesh.bottom);
 		var intersectionArea = calcArea(getIntersect(poly, mesh));
 		var rate = Math.abs(intersectionArea / meshArea);
-		console.log(intersectionArea,"/",meshArea);
 		return rate;
 	};
 	if (!intersect && !inside)  {return 0;};
@@ -381,7 +398,8 @@ var getOverwrapRateMatrix = function(matrix,poly){
 		result_yy.push(result_xx);
 		result_xx = [];
 	};
-return result_yy;
+	console.log(result_yy);
+	return result_yy;
 };
 
 
